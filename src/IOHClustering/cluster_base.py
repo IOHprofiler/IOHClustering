@@ -1,3 +1,7 @@
+import tarfile
+import warnings
+
+import urllib
 import ioh 
 import numpy as np
 import os
@@ -169,7 +173,22 @@ def get_problem(fid: int | str, instance: int = 1, k: int = 2) -> ioh.problem.Re
 
 
 
-def download_static_folder():
+def download_static_folder(warn = True):
+    target = os.path.realpath("IOHClustering")
+    branch = "master"
+
+    if os.path.isdir(target) and warn:
+        warnings.warn(f"Attempting to download static folder but path {target} already exists. Skipping...")
+        return 
+    
+    os.makedirs(target)
+    github_static_folder = f"https://github.com/IOHprofiler/IOHClustering/blob/{branch}/static.tar.gz?raw=true" 
+
+    with urllib.request.urlopen(github_static_folder) as f:
+        thetarfile = tarfile.open(fileobj=f, mode="r|gz")
+        thetarfile.extractall(target)
+
+
     pass
 
 def load_problems(datasets_path: str = "data"):
