@@ -7,8 +7,7 @@ As part of the IOHprofiler framework, IOHClustering is under active development.
 ## Features
 
 - Transform datasets into clustering problems compatible with the IOHprofiler framework.
-- Enable seamless integration for performance evaluation and analysis.
-- Support advanced clustering capabilities for large-scale data processing.
+- 
 
 ## Installation
 
@@ -84,7 +83,7 @@ from iohclustering import create_cluster_problem, general_cluster_metric
 import numpy as np
 
 # Example dataset
-dataset = [ ... ]
+dataset = "iris_pca"
 
 # Define a custom error function
 def custom_error_function(X, centroids, labels):
