@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from src.iohclustering.utils_metrics import mse_error
+from iohclustering.utils_metrics import mse_error
 
 # filepath: src/IOHClustering/test_utils_metrics.py
 

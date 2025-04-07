@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import numpy as np
 
-from src.iohclustering.cluster_base import (
+from iohclustering.cluster_base import (
     create_cluster_problem,
     get_problem_id,
     get_problem,
