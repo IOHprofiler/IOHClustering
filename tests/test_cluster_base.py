@@ -39,18 +39,18 @@ class TestClusterBase(unittest.TestCase):
             create_cluster_problem(dataset, k=2, error_metric="invalid_metric")
 
     def test_get_problem_id_valid(self):
-        with patch.dict("src.IOHClustering.cluster_base.CLUSTER_BASELINE_DATASETS", {1: "test_dataset"}):
+        with patch.dict("iohclustering.cluster_base.CLUSTER_BASELINE_DATASETS", {1: "test_dataset"}):
             self.assertEqual(get_problem_id("test_dataset"), 1)
 
     def test_get_problem_id_invalid(self):
-        with patch.dict("src.IOHClustering.cluster_base.CLUSTER_BASELINE_DATASETS", {1: "test_dataset"}):
+        with patch.dict("iohclustering.cluster_base.CLUSTER_BASELINE_DATASETS", {1: "test_dataset"}):
             with self.assertRaises(ValueError):
                 get_problem_id("unknown_dataset")
 
-    @patch("src.IOHClustering.cluster_base.create_cluster_problem")
+    @patch("iohclustering.cluster_base.create_cluster_problem")
     def test_get_problem_valid(self, mock_create_cluster_problem):
         mock_create_cluster_problem.return_value = (MagicMock(), MagicMock())
-        with patch.dict("src.IOHClustering.cluster_base.CLUSTER_BASELINE_DATASETS", {1: "test_dataset"}):
+        with patch.dict("iohclustering.cluster_base.CLUSTER_BASELINE_DATASETS", {1: "test_dataset"}):
             f, retransform = get_problem(1, instance=1, k=2)
             self.assertTrue(callable(retransform))
             self.assertIsNotNone(f)
