@@ -7,7 +7,11 @@ As part of the IOHprofiler framework, IOHClustering is under active development.
 ## Features
 
 - Transform datasets into clustering problems compatible with the IOHprofiler framework.
-- 
+- Real-world datasets for clustering, such as:
+    - Iris dataset
+    - Wine dataset
+    - KC1 dataset
+    - Glass dataset
 
 ## Installation
 
