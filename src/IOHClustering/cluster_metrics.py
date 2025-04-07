@@ -3,44 +3,6 @@ import numpy as np
 import typing
 from .utils_metrics import euclidean_distance, mse_error
 
-def mse_cluster(X, centroids):
-    """
-    Calculate the mean squared error (MSE) for a k-means clustering problem.
-
-    Parameters:
-    - X: numpy array of shape (m, n), where m is the number of data points and n is the dimensionality of the data.
-    - centroids: numpy array of shape (k, n), where k is the number of clusters and n is the dimensionality of the centroids.
-
-    Returns:
-    - mse: Mean Squared Error value for the given data points and centroids.
-    
-    """
-    # Initialize an array to store the labels (cluster assignments)
-    labels = np.zeros(len(X), dtype=int)
-
-    # Calculate labels (assign closest centroid to each data point)
-    for i in range(len(X)):
-        # Compute the distance between the point and each centroid
-        distances = np.linalg.norm(X[i] - centroids, axis=1)
-        # Assign the label as the index of the closest centroid
-        labels[i] = np.argmin(distances)
-
-    # Now calculate the Mean Squared Error
-    mse = 0
-    for i in range(len(X)):
-        # Get the centroid of the assigned cluster
-        centroid = centroids[labels[i]]
-        # Compute the squared error manually (Euclidean distance squared)
-        squared_error = np.sum((X[i] - centroid) ** 2)
-        mse += squared_error
-
-    # Average the MSE by the number of data points
-    mse /= len(X)
-
-    return mse
-
-
-
 def compute_labels(
         X: np.ndarray, 
         centroids: np.ndarray, 
