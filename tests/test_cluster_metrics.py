@@ -1,10 +1,11 @@
 import unittest
 import numpy as np
 from unittest.mock import patch, MagicMock
-from iohclustering.utils_metrics import euclidean_distance, mse_error
 
 # filepath: src/IOHClustering/test_cluster_metrics.py
-from iohclustering.cluster_metrics import (
+from iohclustering import (
+    euclidean_distance, 
+    mse_error,
     compute_labels,
     general_cluster_metric,
     CLUSTER_METRICS,
