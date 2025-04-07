@@ -2,7 +2,7 @@
 
 **IOHClustering** provides an interface for clustering problems, allowing users to map a dataset and a specified number of clusters to the IOHprofiler problem format. This enables seamless integration with the IOHprofiler framework for further analysis and performance evaluation.
 
-As part of the IOHprofiler framework, IOHClustering is under active development. Some features may still be evolving, with potential updates to functionality and interfaces. The package aims to complement the [IOHanalyzer web-version](https://iohanalyzer.liacs.nl/) by offering advanced clustering capabilities and enabling large-scale data processing, which is not supported in the web version.
+As part of the IOHprofiler framework, IOHClustering is under active development. Some features may still be evolving, with potential updates to functionality and interfaces.
 
 ## Features
 
@@ -24,10 +24,45 @@ pip install .
 ```
 
 ## Basic Usage
+### Examples and Tutorials
 
-### Example: Clustering with Random Search
+Below are several examples demonstrating how to use **IOHClustering** for various clustering tasks. These examples cover basic usage, working with benchmark problems, solving custom datasets, and defining custom evaluation functions.
 
-Below is an example of how to use **IOHClustering** to create a clustering problem and solve it using a simple random search algorithm.
+#### Example: Clustering a Dataset
+
+The following example shows how to create a clustering problem with a known dataset using the **IOHClustering** framework:
+
+```python
+from iohclustering import create_cluster_problem
+
+# Example dataset
+dataset = "iris_pca"
+
+# Create a clustering problem
+clustering_problem, retransform = create_cluster_problem(
+    dataset=dataset,
+    k=2,
+)
+
+print(clustering_problem.meta_data)
+```
+
+#### Example: Listing Available Benchmark Problems
+
+You can retrieve a list of all benchmark problems available in **IOHClustering**:
+
+```python
+from iohclustering import load_problems
+
+problems = load_problems()
+
+for problem in problems.keys():
+    print(problem)
+```
+
+#### Example: Solving a Custom Dataset with Random Search
+
+This example demonstrates how to solve a clustering problem using a simple random search algorithm:
 
 ```python
 from iohclustering import create_cluster_problem
@@ -52,39 +87,37 @@ class RandomSearch:
     """Simple random search algorithm"""
     def __init__(self, budget_factor: int):
         self.budget_factor: int = budget_factor
-        
+
     def __call__(self, problem: ioh.problem.RealSingleObjective) -> None:
         """Evaluate the problem `budget_factor * DIM` times with a randomly generated solution"""
         for _ in range(self.budget_factor * problem.meta_data.n_variables):
-            # Generate a random solution within the problem bounds
-            x = np.random.uniform(problem.bounds.lb, problem.bounds.ub)            
-            problem(x) 
+            x = np.random.uniform(problem.bounds.lb, problem.bounds.ub)
+            problem(x)
 
 # Set up a logger to store results
 logger = ioh.logger.Analyzer(
-    root=os.getcwd(),                  # Store data in the current working directory
-    folder_name="RS_Test",             # in a folder named: 'RS_Test'
-    algorithm_name="RandomSearch",    # meta-data for the algorithm used to generate these results
+    root=os.getcwd(),
+    folder_name="RS_Test",
+    algorithm_name="RandomSearch",
 )
 
 # Attach the logger and run the random search
-RS = RandomSearch(budget_factor=2000)      
-clustering_problem.attach_logger(logger)      
+RS = RandomSearch(budget_factor=2000)
+clustering_problem.attach_logger(logger)
 RS(clustering_problem)
 
 # Close the logger after the run
 logger.close()
 ```
 
-This example demonstrates how to define a clustering problem, use a simple random search algorithm to solve it, and log the results for further analysis.
+This example illustrates how to define a clustering problem, solve it using random search, and log the results for further analysis.
 
-### Example: Custom Function for Clustering Problem
+#### Example: Custom Evaluation Function for Clustering
 
-You can define a custom function to evaluate clustering solutions. Below is an example of how to create and use a custom evaluation function:
+You can define a custom evaluation function for clustering problems. Here's an example:
 
 ```python
 from iohclustering import create_cluster_problem, general_cluster_metric
-import numpy as np
 
 # Example dataset
 dataset = "iris_pca"
@@ -107,7 +140,9 @@ clustering_problem = create_cluster_problem(
 )
 ```
 
-This example demonstrates how to define a custom evaluation function for clustering problems and integrate it into the **IOHClustering** framework.
+This example demonstrates how to integrate a custom evaluation function into the **IOHClustering** framework.
+
+
 
 ## Tutorials
 
