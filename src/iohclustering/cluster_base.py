@@ -104,6 +104,25 @@ def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_
     return f, retransform
 
 def download_benchmark_datasets(warn = True) -> None:
+    """
+    Downloads and extracts benchmark datasets from a remote GitHub repository.
+    This function downloads a compressed tarball containing benchmark datasets 
+    from a specified branch of the IOHClustering GitHub repository and extracts 
+    its contents into a local directory named "banchmark_datasets". If the target 
+    directory already exists, a warning is issued (if `warn` is set to True) and 
+    the download is skipped.
+    Args:
+        warn (bool): If True, a warning is issued when the target directory 
+                        already exists. Defaults to True.
+    Raises:
+        urllib.error.URLError: If there is an issue with downloading the file 
+                                from the remote URL.
+        tarfile.TarError: If there is an issue with extracting the tarball.
+    Notes:
+        - The function assumes that the target directory is relative to the 
+            current working directory.
+        - The tarball is downloaded from the "main" branch of the repository.
+    """
     target = os.path.realpath("banchmark_datasets")
     branch = "main"
 
