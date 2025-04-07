@@ -7,7 +7,7 @@ name = "iohclustering"
 version = "0.0.0"
 authors = [
 ]
-description = "Package for IOH clustering problems"
+description = "Package for IOH Clustering problems"
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [

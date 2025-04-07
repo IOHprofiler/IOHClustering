@@ -20,7 +20,7 @@ The minimum supported Python version is 3.10. Install IOHClustering via pip and 
 ```bash
 git clone https://github.com/IOHprofiler/IOHClustering.git
 cd IOHClustering
-pip install iohinspector
+pip install .
 ```
 
 ## Basic Usage
