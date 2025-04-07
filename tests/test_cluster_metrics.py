@@ -5,7 +5,6 @@ from iohclustering.utils_metrics import euclidean_distance, mse_error
 
 # filepath: src/IOHClustering/test_cluster_metrics.py
 from iohclustering.cluster_metrics import (
-    mse_cluster,
     compute_labels,
     general_cluster_metric,
     CLUSTER_METRICS,
