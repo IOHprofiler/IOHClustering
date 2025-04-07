@@ -17,7 +17,7 @@ def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_
     ---------
         dataset : str or np.ndarray
             The dataset to be used for clustering. If a string is provided, it is assumed
-            to be the name of a file (without extension) located in the 'data/' directory
+            to be the name of a file (without extension) located in the 'banchmark_datasets/' directory
             with a '.txt' extension. If an np.ndarray is provided, it is used directly
             as the dataset.
         k : int
@@ -25,9 +25,9 @@ def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_
         instance : int, optional (default=1)
             The instance number for the problem. Useful for generating different problem
             instances with the same structure.
-        error_metric : str or callable, optional (default="mse")
+        error_metric : str or callable, optional (default="mse_euclidean")
             The error metric to evaluate the clustering. If a string is provided, it must
-            match one of the predefined metrics in `ERROR_METRICS`. If a callable is provided,
+            match one of the predefined metrics in `CLUSTER_METRICS`. If a callable is provided,
             it should accept two arguments: the normalized dataset and the cluster centers.
     
     Returns:
@@ -42,7 +42,7 @@ def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_
     Raises:
     ---------
         ValueError : If the provided `error_metric` is a string and does not match any predefined
-                     metric in `ERROR_METRICS`.
+                     metric in `CLUSTER_METRICS`.
 
     Notes:
         - The dataset is normalized to the range [0, 1] to ensure consistent scaling.
@@ -51,9 +51,14 @@ def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_
         - The problem is set up for minimization, as clustering typically aims to minimize
             the error metric.
     """
-
+    id = None
     if isinstance(dataset, str):
-        data = np.loadtxt(f'data/{dataset}.txt', delimiter=',')
+        if os.path.exists(f'{dataset}.txt'):
+            data = np.loadtxt(f'{dataset}.txt', delimiter=',')
+        else:
+            id = get_problem_id(dataset)
+            data = np.loadtxt(f'banchmark_datasets/{dataset}.txt', delimiter=',')
+
     else:
         data = dataset
         dataset = 'custom'
@@ -89,17 +94,30 @@ def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_
     )
     
     # Set the meta data for the problem
-    try:
-        id = get_problem_id(dataset)
+    if(id is not None):
         f.set_id(id)
-    except ValueError:
-        pass
 
     def retransform(X):
         X2 = ((X * (data_max - data_min)) + data_min)
         return X2.reshape(k, -1)
 
     return f, retransform
+
+def download_benchmark_datasets(warn = True) -> None:
+    target = os.path.realpath("banchmark_datasets")
+    branch = "main"
+
+    if os.path.isdir(target) and warn:
+        warnings.warn(f"Attempting to download static folder but path {target} already exists. Skipping...")
+        return 
+    
+    os.makedirs(target, exist_ok=True)
+    github_static_folder = f"https://github.com/IOHprofiler/IOHClustering/blob/{branch}/static.tar.gz?raw=true" 
+    print(f"Downloading static folder from {github_static_folder} to {target}")
+    with urllib.request.urlopen(github_static_folder) as f:
+        thetarfile = tarfile.open(fileobj=f, mode="r|gz")
+        thetarfile.extractall(target)
+
 
 
 def get_problem_id(dataset_name: str) -> int:
@@ -174,7 +192,7 @@ def get_problem(fid: int | str, instance: int = 1, k: int = 2) -> ioh.problem.Re
 
 
 
-def load_problems(datasets_path: str = "data"):
+def load_problems():
     """
     Loads clustering problems from the specified datasets path.
 
@@ -186,7 +204,7 @@ def load_problems(datasets_path: str = "data"):
     Parameters:
     ---------
         datasets_path (str): The path to the directory containing dataset files. 
-                             Defaults to "data".
+                             Defaults to "banchmark_datasets".
 
     Returns:
     ---------
@@ -194,6 +212,8 @@ def load_problems(datasets_path: str = "data"):
               and the values are the corresponding clustering problem objects.
 
     """
+    download_benchmark_datasets(warn=False)
+    datasets_path = "banchmark_datasets"
     problems = {}
     for dataset in CLUSTER_BASELINE_DATASETS.values():
         if f"{dataset}.txt" in os.listdir(datasets_path):

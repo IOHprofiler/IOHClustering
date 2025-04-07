@@ -17,9 +17,9 @@ class TestClusterBase(unittest.TestCase):
         mock_loadtxt.return_value = np.array([[1, 2], [3, 4]])
         mock_wrap_problem.return_value = MagicMock()
 
-        f, retransform = create_cluster_problem("test_dataset", k=2, error_metric="mse_euclidean")
+        f, retransform = create_cluster_problem("iris_pca", k=2, error_metric="mse_euclidean")
 
-        mock_loadtxt.assert_called_once_with('data/test_dataset.txt', delimiter=',')
+        mock_loadtxt.assert_called_once_with('banchmark_datasets/iris_pca.txt', delimiter=',')
         self.assertTrue(callable(retransform))
         self.assertIsNotNone(f)
 

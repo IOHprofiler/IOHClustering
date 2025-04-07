@@ -30,21 +30,33 @@ Below are several examples demonstrating how to use **IOHClustering** for variou
 
 #### Example: Clustering a Dataset
 
-The following example shows how to create a clustering problem with a known dataset using the **IOHClustering** framework:
+The following example shows how to get a benchmark clustering problem (by name or ID) the **IOHClustering** framework:
 
 ```python
-from iohclustering import create_cluster_problem
+from iohclustering import get_problem, download_benchmark_datasets
 
-# Example dataset
-dataset = "iris_pca"
+# Download benchmark datasets
+download_benchmark_datasets()
 
-# Create a clustering problem
-clustering_problem, retransform = create_cluster_problem(
-    dataset=dataset,
-    k=2,
+# Get benchmark problem by name (e.g., "iris_pca") with k=2 clusters
+clustering_problem, retransform = get_problem(fid="iris_pca", k=2)
+
+# Alternatively, get benchmark problem by its ID (e.g., ID=5) with k=2 clusters
+clustering_problem, retransform = get_problem(fid=5, k=2)
+
+# Print metadata of the clustering problem
+print(clustering_problem.meta_data)
+
+# Set up a logger to store results in the specified directory
+logger = ioh.logger.Analyzer(
+    root=os.getcwd(),  # Current working directory
+    folder_name="AttachedLogger",  # Folder to store logs
+    algorithm_name="None",  # Name of the algorithm (can be customized)
 )
 
-print(clustering_problem.meta_data)
+# Attach the logger to the created clustering problem
+clustering_problem.attach_logger(logger)
+
 ```
 
 #### Example: Listing Available Benchmark Problems
@@ -60,93 +72,14 @@ for problem in problems.keys():
     print(problem)
 ```
 
-#### Example: Solving a Custom Dataset with Random Search
-
-This example demonstrates how to solve a clustering problem using a simple random search algorithm:
-
-```python
-from iohclustering import create_cluster_problem
-import ioh
-import numpy as np
-import os
-
-# Example dataset
-dataset = [
-    [1.0, 2.0],
-    [2.0, 3.0],
-    [3.0, 4.0],
-    [8.0, 9.0],
-    [9.0, 10.0]
-]
-
-# Initialize the clustering interface
-clustering_problem, retransform = create_cluster_problem(dataset, k=2)
-
-# Define a simple random search algorithm
-class RandomSearch:
-    """Simple random search algorithm"""
-    def __init__(self, budget_factor: int):
-        self.budget_factor: int = budget_factor
-
-    def __call__(self, problem: ioh.problem.RealSingleObjective) -> None:
-        """Evaluate the problem `budget_factor * DIM` times with a randomly generated solution"""
-        for _ in range(self.budget_factor * problem.meta_data.n_variables):
-            x = np.random.uniform(problem.bounds.lb, problem.bounds.ub)
-            problem(x)
-
-# Set up a logger to store results
-logger = ioh.logger.Analyzer(
-    root=os.getcwd(),
-    folder_name="RS_Test",
-    algorithm_name="RandomSearch",
-)
-
-# Attach the logger and run the random search
-RS = RandomSearch(budget_factor=2000)
-clustering_problem.attach_logger(logger)
-RS(clustering_problem)
-
-# Close the logger after the run
-logger.close()
-```
-
-This example illustrates how to define a clustering problem, solve it using random search, and log the results for further analysis.
-
-#### Example: Custom Evaluation Function for Clustering
-
-You can define a custom evaluation function for clustering problems. Here's an example:
-
-```python
-from iohclustering import create_cluster_problem, general_cluster_metric
-
-# Example dataset
-dataset = "iris_pca"
-
-# Define a custom error function
-def custom_error_function(X, centroids, labels):
-    pass
-
-# Define a custom distance function
-def custom_distance_function(x, centroids):
-    pass
-
-clustering_function = general_cluster_metric(custom_distance_function, custom_error_function)
-
-# Create a clustering problem with the custom function
-clustering_problem = create_cluster_problem(
-    dataset=dataset,
-    k=2,
-    error_metric=clustering_function
-)
-```
-
-This example demonstrates how to integrate a custom evaluation function into the **IOHClustering** framework.
-
 
 
 ## Tutorials
+### Tutorials
 
-Coming soon!
+Explore the following Jupyter notebooks for step-by-step tutorials on using **IOHClustering**:
+1. [Custom Dataset and Random Search Tutorial](https://github.com/IOHprofiler/IOHClustering/blob/main/tutorials/custom_dataset_random_search.ipynb): Learn how to define clustering problems with your own datasets and explore solutions using random search.
+2. [Custom Metric and Random Search Tutorial](https://github.com/IOHprofiler/IOHClustering/blob/main/tutorials/custom_clustering_metric.ipynb): Understand how to define custom clustering metrics and solve clustering problems with random search.
 
 ## License
 
