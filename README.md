@@ -45,7 +45,7 @@ dataset = [
 ]
 
 # Initialize the clustering interface
-clustering_problem = create_cluster_problem(dataset, k=2)
+clustering_problem, retransform = create_cluster_problem(dataset, k=2)
 
 # Define a simple random search algorithm
 class RandomSearch:
@@ -103,7 +103,7 @@ clustering_function = general_cluster_metric(custom_distance_function, custom_er
 clustering_problem = create_cluster_problem(
     dataset=dataset,
     k=2,
-    evaluation_function=clustering_function
+    error_metric=clustering_function
 )
 ```
 
