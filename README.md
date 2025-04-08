@@ -18,9 +18,7 @@ As part of the IOHprofiler framework, IOHClustering is under active development.
 The minimum supported Python version is 3.10. Install IOHClustering via pip and git:
 
 ```bash
-git clone https://github.com/IOHprofiler/IOHClustering.git
-cd IOHClustering
-pip install .
+pip install iohclustering
 ```
 
 ## Basic Usage
@@ -75,7 +73,6 @@ for problem in problems.keys():
 
 
 ## Tutorials
-### Tutorials
 
 Explore the following Jupyter notebooks for step-by-step tutorials on using **IOHClustering**:
 1. [Custom Dataset and Random Search Tutorial](https://github.com/IOHprofiler/IOHClustering/blob/main/tutorials/custom_dataset_random_search.ipynb): Learn how to define clustering problems with your own datasets and explore solutions using random search.
@@ -83,6 +80,7 @@ Explore the following Jupyter notebooks for step-by-step tutorials on using **IO
 
 ## License
 
+This project is licensed under a standard BSD-3 clause License. See the LICENSE file for details.
 
 
 ## Acknowledgments
