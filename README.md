@@ -33,8 +33,6 @@ The following example shows how to get a benchmark clustering problem (by name o
 ```python
 from iohclustering import get_problem, download_benchmark_datasets
 
-# Download benchmark datasets
-download_benchmark_datasets()
 
 # Get benchmark problem by name (e.g., "iris_pca") with k=2 clusters
 clustering_problem, retransform = get_problem(fid="iris_pca", k=2)
