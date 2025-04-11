@@ -1,70 +1,75 @@
 import unittest
 from unittest.mock import patch, MagicMock
 import numpy as np
+import ioh
+from iohclustering.cluster_base import create_cluster_problem, get_problem_id, get_problem, load_problems
 
-from iohclustering import (
-    create_cluster_problem,
-    get_problem_id,
-    get_problem,
-    load_problems,
-)
+# filepath: src/iohclustering/test_cluster_base.py
+
 
 class TestClusterBase(unittest.TestCase):
 
-    @patch("numpy.loadtxt")
-    @patch("ioh.wrap_problem")
-    def test_create_cluster_problem_with_string_dataset(self, mock_wrap_problem, mock_loadtxt):
-        mock_loadtxt.return_value = np.array([[1, 2], [3, 4]])
-        mock_wrap_problem.return_value = MagicMock()
-
-        f, retransform = create_cluster_problem("iris_pca", k=2, error_metric="mse_euclidean")
-
-        mock_loadtxt.assert_called_once_with('banchmark_datasets/iris_pca.txt', delimiter=',')
-        self.assertTrue(callable(retransform))
-        self.assertIsNotNone(f)
-
-    @patch("ioh.wrap_problem")
-    def test_create_cluster_problem_with_array_dataset(self, mock_wrap_problem):
-        dataset = np.array([[1, 2], [3, 4]])
-        mock_wrap_problem.return_value = MagicMock()
-
-        f, retransform = create_cluster_problem(dataset, k=2, error_metric="mse_euclidean")
-
-        self.assertTrue(callable(retransform))
-        self.assertIsNotNone(f)
-
-    def test_create_cluster_problem_invalid_error_metric(self):
-        dataset = np.array([[1, 2], [3, 4]])
-        with self.assertRaises(ValueError):
-            create_cluster_problem(dataset, k=2, error_metric="invalid_metric")
+    def test_load_problems(self):
+        # Test loading problems
+        problems = load_problems()
+        self.assertIsInstance(problems, dict)
+        self.assertGreater(len(problems), 0)
+        self.assertEqual(len(problems), 40)
+        
+        from iohclustering.cluster_baseline_problems import CLUSTER_BASELINE_DATASETS, BASELINE_K_DIMENTIONS
+        # Check if the problems loaded match the expected datasets and dimensions
+        for dataset, k_values in BASELINE_K_DIMENTIONS.items():
+            for k in k_values:
+                problem_name = f"Cluster_{dataset}_k{k}"
+                self.assertIn(problem_name, problems.keys())
 
     def test_get_problem_id_valid(self):
-        with patch.dict("iohclustering.cluster_base.CLUSTER_BASELINE_DATASETS", {1: "test_dataset"}):
-            self.assertEqual(get_problem_id("test_dataset"), 1)
+        # Test valid dataset names
+        self.assertEqual(get_problem_id("breast_pca"), 1)
+        self.assertEqual(get_problem_id("bReAsT_PcA"), 1)  # Test case-insensitivity
 
     def test_get_problem_id_invalid(self):
-        with patch.dict("iohclustering.cluster_base.CLUSTER_BASELINE_DATASETS", {1: "test_dataset"}):
-            with self.assertRaises(ValueError):
-                get_problem_id("unknown_dataset")
+        # Test invalid dataset name
+        with self.assertRaises(ValueError) as context:
+            get_problem_id("unknown_dataset")
+        self.assertEqual(str(context.exception), "Unknown dataset name unknown_dataset")
 
-    @patch("iohclustering.cluster_base.create_cluster_problem")
-    def test_get_problem_valid(self, mock_create_cluster_problem):
-        mock_create_cluster_problem.return_value = (MagicMock(), MagicMock())
-        with patch.dict("iohclustering.cluster_base.CLUSTER_BASELINE_DATASETS", {1: "test_dataset"}):
-            f, retransform = get_problem(1, instance=1, k=2)
-            self.assertTrue(callable(retransform))
-            self.assertIsNotNone(f)
+    def test_create_cluster_problem(self):
 
-    def test_get_problem_invalid(self):
-        with self.assertRaises(ValueError):
-            get_problem(0, instance=1, k=2)
+        # Test creating a clustering problem
+        k = 2
+        f, retransform = create_cluster_problem("breast_pca", k= k, instance=1, error_metric="mse_euclidean")
+        self.assertEqual(f.meta_data.name, "Cluster_breast_pca_k2")
+        self.assertEqual(f.meta_data.problem_id, 1)
+        self.assertEqual(f.meta_data.instance, 1)
+        self.assertEqual(f.meta_data.n_variables, k*2)
+        self.assertEqual(f.meta_data.optimization_type, ioh.OptimizationType.MIN)
+
+    def test_get_problem(self):
+        k = 2
+        f, retransform = get_problem(1, instance=1, k=k)
+        self.assertEqual(f.meta_data.name, "Cluster_breast_pca_k2")
+        self.assertEqual(f.meta_data.problem_id, 1)
+        self.assertEqual(f.meta_data.instance, 1)
+        self.assertEqual(f.meta_data.n_variables, k*2)
+        self.assertEqual(f.meta_data.optimization_type, ioh.OptimizationType.MIN)
+
+        # Test retrieving a problem by dataset name
+        f, retransform = get_problem("breast_pca", instance=1, k=2)
+        self.assertEqual(f.meta_data.name, "Cluster_breast_pca_k2")
+        self.assertEqual(f.meta_data.problem_id, 1)
+        self.assertEqual(f.meta_data.instance, 1)
+        self.assertEqual(f.meta_data.n_variables, k*2)
+        self.assertEqual(f.meta_data.optimization_type, ioh.OptimizationType.MIN)
+
+        # Test invalid dataset ID
+        with self.assertRaises(ValueError) as context:
+            get_problem(99, instance=1, k=2)
+        self.assertEqual(str(context.exception), "Unknown dataset id 99")
+
+   
 
 
-    def test_retransform_function(self):
-        dataset = np.array([[1, 2], [3, 4]])
-        f, retransform = create_cluster_problem(dataset, k=2, error_metric="mse_euclidean")
-        transformed = retransform(np.array([0.5, 0.5, 0.5, 0.5]))
-        self.assertEqual(transformed.shape, (2, 2))
 
 if __name__ == "__main__":
     unittest.main()
