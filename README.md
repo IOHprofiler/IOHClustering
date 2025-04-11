@@ -85,7 +85,10 @@ This project is licensed under a standard BSD-3 clause License. See the LICENSE 
 
 ## Acknowledgments
 
-
+This work has been estabilished as a collaboration between:
+* Diederick Vermetten 
+* Catalin-Viorel Dinu
+* Marcus Gallagher
 
 ## Cite Us
 
