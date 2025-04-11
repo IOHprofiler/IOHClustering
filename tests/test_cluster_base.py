@@ -4,8 +4,6 @@ import numpy as np
 import ioh
 from iohclustering.cluster_base import create_cluster_problem, get_problem_id, get_problem, load_problems
 
-# filepath: src/iohclustering/test_cluster_base.py
-
 
 class TestClusterBase(unittest.TestCase):
 
@@ -45,6 +43,21 @@ class TestClusterBase(unittest.TestCase):
         self.assertEqual(f.meta_data.n_variables, k*2)
         self.assertEqual(f.meta_data.optimization_type, ioh.OptimizationType.MIN)
 
+    def test_create_cluster_problem_custom_data(self):
+
+        # Test creating a clustering problem
+        data = np.array([[0,0], [1,1], [3,3], [4,4]])
+        k = 2
+        f, retransform = create_cluster_problem(data, k= k, instance=1, error_metric="mse_euclidean")
+        self.assertEqual(f.meta_data.name, "Cluster_custom_k2")
+        self.assertEqual(f.meta_data.instance, 1)
+        self.assertEqual(f.meta_data.n_variables, k*2)
+        self.assertEqual(f.meta_data.optimization_type, ioh.OptimizationType.MIN)
+
+        input_vec = np.array([[1.0, 2.0],[3.0, 4.0]])
+        transformed_input_vec = np.array([0.25, 0.5, 0.75, 1.0])
+        self.assertTrue(np.allclose(retransform(transformed_input_vec), input_vec))
+
     def test_get_problem(self):
         k = 2
         f, retransform = get_problem(1, instance=1, k=k)
@@ -67,7 +80,7 @@ class TestClusterBase(unittest.TestCase):
             get_problem(99, instance=1, k=2)
         self.assertEqual(str(context.exception), "Unknown dataset id 99")
 
-   
+    
 
 
 

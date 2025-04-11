@@ -18,8 +18,7 @@ def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_
     ---------
         dataset : str or np.ndarray
             The dataset to be used for clustering. If a string is provided, it is assumed
-            to be the name of a file (without extension) located in the 'banchmark_datasets/' directory
-            with a '.txt' extension. If an np.ndarray is provided, it is used directly
+            to be the name of a banchmark dataset. If an np.ndarray is provided, it is used directly
             as the dataset.
         k : int
             The number of clusters to create.
@@ -70,7 +69,6 @@ def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_
     
 
     data_np = np.array(data)
-
     # Normalize the data to the range [0, 1]
     data_min = np.tile(np.min(data_np, axis=0), k)
     data_max = np.tile(np.max(data_np, axis=0), k)
