@@ -7,6 +7,7 @@ import numpy as np
 import os
 from .cluster_metrics import *
 from .cluster_baseline_problems import *
+from importlib.resources import files
 
 
 def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_metric="mse_euclidean") -> tuple[ioh.problem.RealSingleObjective, callable]:
@@ -17,8 +18,7 @@ def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_
     ---------
         dataset : str or np.ndarray
             The dataset to be used for clustering. If a string is provided, it is assumed
-            to be the name of a file (without extension) located in the 'banchmark_datasets/' directory
-            with a '.txt' extension. If an np.ndarray is provided, it is used directly
+            to be the name of a banchmark dataset. If an np.ndarray is provided, it is used directly
             as the dataset.
         k : int
             The number of clusters to create.
@@ -53,11 +53,9 @@ def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_
     """
     id = None
     if isinstance(dataset, str):
-        if os.path.exists(f'{dataset}.txt'):
-            data = np.loadtxt(f'{dataset}.txt', delimiter=',')
-        else:
-            id = get_problem_id(dataset)
-            data = np.loadtxt(f'banchmark_datasets/{dataset}.txt', delimiter=',')
+        id = get_problem_id(dataset)
+        dataset_path = files("iohclustering.static").joinpath(f"{dataset}.txt")
+        data = np.loadtxt(dataset_path, delimiter=',')
 
     else:
         data = dataset
@@ -71,7 +69,6 @@ def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_
     
 
     data_np = np.array(data)
-
     # Normalize the data to the range [0, 1]
     data_min = np.tile(np.min(data_np, axis=0), k)
     data_max = np.tile(np.max(data_np, axis=0), k)
@@ -102,41 +99,6 @@ def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_
         return X2.reshape(k, -1)
 
     return f, retransform
-
-def download_benchmark_datasets(warn = True) -> None:
-    """
-    Downloads and extracts benchmark datasets from a remote GitHub repository.
-    This function downloads a compressed tarball containing benchmark datasets 
-    from a specified branch of the IOHClustering GitHub repository and extracts 
-    its contents into a local directory named "banchmark_datasets". If the target 
-    directory already exists, a warning is issued (if `warn` is set to True) and 
-    the download is skipped.
-    Args:
-        warn (bool): If True, a warning is issued when the target directory 
-                        already exists. Defaults to True.
-    Raises:
-        urllib.error.URLError: If there is an issue with downloading the file 
-                                from the remote URL.
-        tarfile.TarError: If there is an issue with extracting the tarball.
-    Notes:
-        - The function assumes that the target directory is relative to the 
-            current working directory.
-        - The tarball is downloaded from the "main" branch of the repository.
-    """
-    target = os.path.realpath("banchmark_datasets")
-    branch = "main"
-
-    if os.path.isdir(target) and warn:
-        warnings.warn(f"Attempting to download static folder but path {target} already exists. Skipping...")
-        return 
-    
-    os.makedirs(target, exist_ok=True)
-    github_static_folder = f"https://github.com/IOHprofiler/IOHClustering/blob/{branch}/static.tar.gz?raw=true" 
-    print(f"Downloading static folder from {github_static_folder} to {target}")
-    with urllib.request.urlopen(github_static_folder) as f:
-        thetarfile = tarfile.open(fileobj=f, mode="r|gz")
-        thetarfile.extractall(target)
-
 
 
 def get_problem_id(dataset_name: str) -> int:
@@ -231,11 +193,13 @@ def load_problems():
               and the values are the corresponding clustering problem objects.
 
     """
-    download_benchmark_datasets(warn=False)
-    datasets_path = "banchmark_datasets"
+    
+    folder = files("iohclustering.static")
+    datasets_names = [f.name for f in folder.iterdir() if f.suffix == ".txt"]
+
     problems = {}
     for dataset in CLUSTER_BASELINE_DATASETS.values():
-        if f"{dataset}.txt" in os.listdir(datasets_path):
+        if f"{dataset}.txt" in datasets_names:
             for k in BASELINE_K_DIMENTIONS[dataset]:
                 problem, retransform = create_cluster_problem(dataset, k)
                 problems[problem.meta_data.name] = problem, retransform

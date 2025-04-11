@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "iohclustering"
-version = "0.0.1b"
+version = "0.0.2"
 authors = [
 ]
 description = "Package for IOH Clustering problems"
@@ -19,6 +19,14 @@ dependencies = [
   "ioh",
   "numpy",
 ]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+
+[tool.setuptools.package-data]
+"iohclustering" = ["static/*.txt"]
+
 
 [project.optional-dependencies]
 test = [
