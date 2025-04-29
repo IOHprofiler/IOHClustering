@@ -2,7 +2,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 import numpy as np
 import ioh
-from iohclustering.cluster_base import create_cluster_problem, get_problem_id, get_problem, load_problems
+from iohclustering.cluster_base import create_cluster_problem, get_problem_id, get_problem, load_problems, get_kmeans_pp_baseline
+from iohclustering.cluster_baseline_problems import BASELINE_K_DIMENTIONS
 
 
 class TestClusterBase(unittest.TestCase):
@@ -82,7 +83,13 @@ class TestClusterBase(unittest.TestCase):
 
     
 
+    def test_get_kmeans_pp_baseline(self):
+        # Test loading the k-means++ baseline problems
+        baseline_kmeans_pp_mse = get_kmeans_pp_baseline()
 
+        self.assertEqual(len(baseline_kmeans_pp_mse), 40)
+
+        
 
 if __name__ == "__main__":
     unittest.main()

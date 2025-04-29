@@ -23,3 +23,6 @@ BASELINE_K_DIMENTIONS={
     "segment_pca": [2, 3, 5, 10],
     "wine_pca": [2, 3, 5, 10],
 }
+
+
+KMEANSPP_BASELINE_FILE = "kmeans_baseline_100.csv"

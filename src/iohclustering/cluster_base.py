@@ -8,7 +8,7 @@ import os
 from .cluster_metrics import *
 from .cluster_baseline_problems import *
 from importlib.resources import files
-
+import pandas as pd
 
 def create_cluster_problem(dataset: str | np.ndarray, k: int, instance=1, error_metric="mse_euclidean") -> tuple[ioh.problem.RealSingleObjective, callable]:
     """
@@ -205,3 +205,26 @@ def load_problems():
                 problems[problem.meta_data.name] = problem, retransform
     return problems
 
+
+def get_kmeans_pp_baseline():
+    """
+    Load the KMeans++ baseline data from a CSV file.
+
+    This function reads the KMeans++ baseline data from a CSV file and returns
+    it as a Pandas DataFrame. The CSV file is expected to be located in the
+    "iohclustering.static" directory.
+
+    Returns:
+    ---------
+        pd.DataFrame: The KMeans++ baseline data as a Pandas DataFrame.
+    
+    Raises:
+    ---------
+        FileNotFoundError: If the KMeans++ baseline file does not exist.
+    """
+    
+    kmeanspp_baseline_path = files("iohclustering.static").joinpath(KMEANSPP_BASELINE_FILE)
+    if not os.path.exists(kmeanspp_baseline_path):
+        raise FileNotFoundError(f"KMeans++ baseline file {KMEANSPP_BASELINE_FILE} does not exist.")
+    
+    return pd.read_csv(kmeanspp_baseline_path)
